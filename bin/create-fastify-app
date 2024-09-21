@@ -26,8 +26,8 @@ else
         $cp_cmd
         cp_hidden_cmd="cp -aR $script_dir/fastify-template/.gitignore $project_path/"
         $cp_hidden_cmd
-        cp_hidden_cmd_env="cp -aR $script_dir/fastify-template/.env.example $project_path/.env"
-        $cp_hidden_cmd_env
+        # cp_hidden_cmd_env="cp -aR $script_dir/fastify-template/.env.example $project_path/.env"
+        # $cp_hidden_cmd_env
         echo "NodeJS application successfully initialized."
     elif [[ "$os_type" == "Linux" ]]; then
         echo "Detected Linux operating system."
