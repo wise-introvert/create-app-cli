@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+project_name=$1
+project_path="$PWD/$project_name"
+GIT='git --git-dir='$project_path'/.git'
+
+script_dir=$(dirname $0)
+os_type=$(uname)
+
+if [[ "$os_type" == "CYGWIN"* || "$os_type" == "MINGW"* ]]; then
+    echo "Current operating system(Windows: Cygwin or Git Bash) is not supported."
+fi
+
+if [ -d "$project_path" ]; then
+    echo "Directory already exists"
+else
+    echo "Creating directory $project_name..."
+    mkdir_cmd="mkdir $project_path"
+    $mkdir_cmd
+    echo "Directory created successfully at $project_path"
+
+    if [[ "$os_type" == "Darwin" ]]; then
+        echo "Detected MacOS operating system."
+        echo "Initializing NodeJS application..."
+        cp_cmd="cp -aR $script_dir/fastify-template/* $project_path"
+        $cp_cmd
+        cp_hidden_cmd="cp -aR $script_dir/fastify-template/.gitignore $project_path/"
+        $cp_hidden_cmd
+        cp_hidden_cmd_env="cp -aR $script_dir/fastify-template/.env.example $project_path/.env"
+        $cp_hidden_cmd_env
+        echo "NodeJS application successfully initialized."
+    elif [[ "$os_type" == "Linux" ]]; then
+        echo "Detected Linux operating system."
+        echo "Initializing NodeJS application..."
+        cp_cmd="cp -ar $script_dir/fastify-template/* $project_path"
+        $cp_cmd
+        cp_hidden_cmd="cp -ar $script_dir/fastify-template/.gitignore $project_path/"
+        $cp_hidden_cmd
+        # cp_hidden_cmd_env="cp -ar $script_dir/fastify-template/.env.example $project_path/.env"
+        # $cp_hidden_cmd_env
+        echo "NodeJS application successfully initialized."
+    fi
+
+    cd_cmd="cd $project_path"
+    $cd_cmd
+
+    update_pkg_cmd="npm pkg set name=$project_name"
+    $update_pkg_cmd
+
+    echo "Installing dependencies..."
+    dep_cmd="yarn"
+    $dep_cmd
+    echo "Dependencies installed successfully!"
+
+    echo "Initializing git..."
+    $GIT init
+    echo "initialized git"
+
+    echo "Staging changes..."
+    $GIT add .
+    echo "changes staged"
+
+    echo "Commiting staged changes..."
+    $GIT commit -m "feat: init commit"
+    echo "commit complete"
+fi
+
