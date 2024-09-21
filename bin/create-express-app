@@ -5,6 +5,11 @@ project_path="$PWD/$project_name"
 GIT='git --git-dir='$project_path'/.git'
 
 script_dir=$(dirname $0)
+os_type=$(uname)
+
+if [[ "$os_type" == "CYGWIN"* || "$os_type" == "MINGW"* ]]; then
+    echo "Current operating system(Windows: Cygwin or Git Bash) is not supported."
+fi
 
 if [ -d "$project_path" ]; then
     echo "Directory already exists"
@@ -14,14 +19,27 @@ else
     $mkdir_cmd
     echo "Directory created successfully at $project_path"
 
-    echo "Initializing NodeJS application..."
-    cp_cmd="cp -ar $script_dir/express-template/* $project_path"
-    $cp_cmd
-    cp_hidden_cmd="cp -ar $script_dir/express-template/.gitignore $project_path/"
-    $cp_hidden_cmd
-    cp_hidden_cmd_env="cp -ar $script_dir/express-template/.env $project_path/"
-    $cp_hidden_cmd_env
-    echo "NodeJS application successfully initialized."
+    if [[ "$os_type" == "Darwin" ]]; then
+        echo "Detected MacOS operating system."
+        echo "Initializing NodeJS application..."
+        cp_cmd="cp -aR $script_dir/express-template/* $project_path"
+        $cp_cmd
+        cp_hidden_cmd="cp -aR $script_dir/express-template/.gitignore $project_path/"
+        $cp_hidden_cmd
+        cp_hidden_cmd_env="cp -aR $script_dir/express-template/.env.example $project_path/.env"
+        $cp_hidden_cmd_env
+        echo "NodeJS application successfully initialized."
+    elif [[ "$os_type" == "Linux" ]]; then
+        echo "Detected Linux operating system."
+        echo "Initializing NodeJS application..."
+        cp_cmd="cp -ar $script_dir/express-template/* $project_path"
+        $cp_cmd
+        cp_hidden_cmd="cp -ar $script_dir/express-template/.gitignore $project_path/"
+        $cp_hidden_cmd
+        cp_hidden_cmd_env="cp -ar $script_dir/express-template/.env.example $project_path/.env"
+        $cp_hidden_cmd_env
+        echo "NodeJS application successfully initialized."
+    fi
 
     cd_cmd="cd $project_path"
     $cd_cmd
