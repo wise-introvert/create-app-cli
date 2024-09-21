@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+
+project_name=$1
+project_path="$PWD/$project_name"
+GIT='git --git-dir='$project_path'/.git'
+
+script_dir=$(dirname $0)
+
+if [ -d "$project_path" ]; then
+    echo "Directory already exists"
+else
+    echo "Creating directory $project_name..."
+    mkdir_cmd="mkdir $project_path"
+    $mkdir_cmd
+    echo "Directory created successfully at $project_path"
+
+    echo "Initializing NodeJS application..."
+    cp_cmd="cp -ar $script_dir/express-template/* $project_path"
+    $cp_cmd
+    cp_hidden_cmd="cp -ar $script_dir/express-template/.gitignore $project_path/"
+    $cp_hidden_cmd
+    cp_hidden_cmd_env="cp -ar $script_dir/express-template/.env $project_path/"
+    $cp_hidden_cmd_env
+    echo "NodeJS application successfully initialized."
+
+    cd_cmd="cd $project_path"
+    $cd_cmd
+
+    update_pkg_cmd="npm pkg set name=$project_name"
+    $update_pkg_cmd
+
+    echo "Installing dependencies..."
+    dep_cmd="yarn"
+    $dep_cmd
+    echo "Dependencies installed successfully!"
+
+    echo "Initializing git..."
+    $GIT init
+    echo "initialized git"
+
+    echo "Staging changes..."
+    $GIT add .
+    echo "changes staged"
+
+    echo "Commiting staged changes..."
+    $GIT commit -m "feat: init commit"
+    echo "commit complete"
+fi
